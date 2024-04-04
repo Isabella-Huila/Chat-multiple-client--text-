@@ -1,20 +1,18 @@
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
 class ClientHandler implements Runnable {
     private Socket clientSocket;
     private BufferedReader in;
     private PrintWriter out;
     private String clientName;
-    Chatters clientes;
-
-    public ClientHandler(Socket socket, Chatters clientes) {
-        this.clientes = clientes;
+    private Chatters clients;
+    public ClientHandler(Socket socket, Chatters clients) {
+        this.clients = clients;
         this.clientSocket = socket;
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            out = new PrintWriter(socket.getOutputStream(), true); // Se inicializa el flujo de salida aquí
+            out = new PrintWriter(socket.getOutputStream(), true);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -23,52 +21,79 @@ class ClientHandler implements Runnable {
     @Override
     public void run() {
         try {
-
             while (true) {
-                // out.println("Ingrese su nombre:");
                 out.println("SUBMITNAME");
                 clientName = in.readLine();
                 if (clientName == null) {
                     return;
                 }
                 synchronized (clientName) {
-                    if (!clientName.isBlank() && !clientes.existeUsr(clientName)) {
-                        clientes.broadcastMessage(clientName + " se ha unido al chat.");
+                    if (!clientName.isBlank() && !clients.existeUsr(clientName)) {
+                        clients.broadcastMessage(clientName + " se ha unido al chat.");
                         out.println("NAMEACCEPTED " + clientName);
-                        clientes.addUsr(clientName, out);
+                        clients.addUsr(clientName, out);
                         break;
                     }
-
                 }
             }
+            /**
+             * /creategroup <nombre_grupo>: Crea un nuevo grupo.
+             * /join <nombre_grupo>: Une al usuario al grupo especificado.
+             * /leave <nombre_grupo>: Elimina al usuario del grupo especificado.
+             * /send #<nombre_grupo>|<mensaje>: Envía un mensaje al grupo especificado.
+             * /send @<usuario>|<mensaje>: Envía un mensaje a un usuario específico.
+             */
 
             String message;
-            // esperar mensajes de cada cliente y enviarlo a todos los clientes
-            // si el mensaje es dirijido a un cliente en especial, se debe separar el
-            // destinatario del mensaje y enviarlo unicamente a esa persona
             while ((message = in.readLine()) != null) {
-
-                String[] parts = message.split(":", 2);
-                if (parts.length == 2) {
-                    String recipient = parts[0].trim();
+                if (message.startsWith("/creategroup")) {
+                    String groupName = message.substring(13);
+                    createGroup(groupName);
+                } else if (message.startsWith("/join")) {
+                    String groupName = message.substring(6);
+                    joinGroup(groupName);
+                } else if (message.startsWith("/leave")) {
+                    String groupName = message.substring(7);
+                    leaveGroup(groupName);
+                } else if (message.startsWith("/send")) {
+                    String[] parts = message.substring(6).split("\\|", 2);
+                    String target = parts[0].trim();
                     String content = parts[1].trim();
-                    clientes.sendPrivateMessage(clientName, recipient, content);
-                } else {
-                    clientes.broadcastMessage(clientName + ": " + message);
+                    if (target.startsWith("#")) {
+                        String groupName = target.substring(1);
+                        sendMessageGroup(groupName, content);
+                    } else if(target.startsWith("@")){
+                        clients.sendPrivateMessage(clientName, target.substring(1), content);
+                    }
                 }
-
             }
         } catch (IOException e) {
-            // e.printStackTrace();
+            e.printStackTrace();
         } finally {
             try {
                 clientSocket.close();
                 System.out.println(clientName + " ha abandonado el chat.");
-                clientes.broadcastMessage(clientName + " ha abandonado el chat.");
-                clientes.removeUsr(clientName);
+                clients.broadcastMessage(clientName + " ha abandonado el chat.");
+                clients.removeUsr(clientName);
             } catch (IOException e) {
-                // e.printStackTrace();
+                e.printStackTrace();
             }
         }
+    }
+
+    private void createGroup(String groupName) {
+        clients.createGroup(groupName);
+    }
+
+    private void joinGroup(String groupName) {
+        clients.joinGroup(groupName, clientName, out);
+    }
+
+    private void leaveGroup(String groupName) {
+        clients.leaveGroup(groupName, clientName, out);
+    }
+
+    private void sendMessageGroup(String groupName, String mensaje) {
+        clients.sendMessageGroup(groupName, clientName + ": " + mensaje);
     }
 }

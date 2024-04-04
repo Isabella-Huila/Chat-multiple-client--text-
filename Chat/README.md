@@ -7,14 +7,12 @@ Compilar y ejecutar Server.java
 Modulo Client
 Compilar y ejecutar Client.java
 
-Cada cliente debe usar un nombre de usuario
-diferente. Cuando envía un mensaje a la sala
-el mensaje es enviado a todos incluido el usuario
-que envió el mensaje. Proponer una estrategia 
-para evitar que el mismo usuario reciba el mensaje.
+## Comandos
 
-Si se desea enviar un mensaje privado debe usar la sintaxis:
-usuarioDestino:mensaje
-por ejemplo
+Los usuarios pueden interactuar con el sistema utilizando los siguientes comandos:
 
-Juan:hola juan cómo estas?
+- `/creategroup <nombre_grupo>`: Crea un nuevo grupo de chat con el nombre especificado.
+- `/join <nombre_grupo>`: Permite al usuario unirse a un grupo existente mediante el nombre del grupo.
+- `/send @<usuario>|<mensaje>`: Envia un mensaje directamente a un usuario específico.
+- `/send <nombre_grupo>|<mensaje>`: Envía un mensaje a todos los miembros de un grupo específico.
+
