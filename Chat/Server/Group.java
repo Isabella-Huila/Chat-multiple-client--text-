@@ -1,3 +1,4 @@
+import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,4 +29,10 @@ public class Group {
             escritor.println(name + ": " + mensaje);
         }
     }
+    
+    public Set<PrintWriter> getMembers() {
+        return members;
+    }
+
+   
 }

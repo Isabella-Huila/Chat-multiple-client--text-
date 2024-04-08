@@ -1,10 +1,12 @@
 import java.util.*;
+import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 
 
 public class Chatters {
     private Set<Person> clients = new HashSet<>();
     private Map<String, Group> groups = new HashMap<>();
+    private StringBuilder allHistory = new StringBuilder();
 
     public Chatters() {}
 
@@ -17,6 +19,9 @@ public class Chatters {
             }
         }
         return response;
+    }
+    public boolean existsGroup(String groupName) {
+        return groups.containsKey(groupName);
     }
 
     public void addUsr(String name, PrintWriter out) {
@@ -96,4 +101,49 @@ public class Chatters {
     public Map<String, Group> getGroups() {
         return groups;
     }
+    public void sendVoiceMessageToGroup(String groupName, String senderName) {
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        for (Person p : clients) {
+            if (senderName.equals(p.getName())) {
+                p.getOut().println("Grabando...");
+                byteArrayOutputStream = p.getAudioRecorder().recordAudio();
+                p.getOut().println("Grabación terminada");
+            }
+        }
+    
+        if (existsGroup(groupName)) {
+            Group group = groups.get(groupName);
+            for (PrintWriter escritor : group.getMembers()) {
+                for (Person p : clients) {
+                    if (escritor.equals(p.getOut()) && !p.getName().equals(senderName)) {
+                        p.getOut().println("[Group: " + groupName + ", Sender: " + senderName + "] Audio:");
+                        p.getOut().println("Reproduciendo");
+                        p.getAudioRecorder().reproduceAudio(byteArrayOutputStream);
+                    }
+                }
+            }
+            
+        }
+    }
+
+    public void sendPrivateVoiceMessage(String senderName, String recipientName){
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        for (Person p: clients) {
+            if (senderName == p.getName()){
+                p.getOut().println("Grabando...");
+                byteArrayOutputStream = p.getAudioRecorder().recordAudio();
+                p.getOut().println("Grabacion terminada");
+            }
+        }
+        for (Person p : clients) {
+            if (recipientName.equals(p.getName())) {
+                p.getOut().println("[Private audio from " + senderName + "] ");
+                p.getOut().println("Reproduciendo");
+                p.getAudioRecorder().reproduceAudio(byteArrayOutputStream);
+            }
+        }
+
+    }
+
+
 }

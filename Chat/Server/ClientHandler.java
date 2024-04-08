@@ -7,9 +7,12 @@ class ClientHandler implements Runnable {
     private PrintWriter out;
     private String clientName;
     private Chatters clients;
+    private TapeRecorder audioPlayer; 
+
     public ClientHandler(Socket socket, Chatters clients) {
         this.clients = clients;
         this.clientSocket = socket;
+        this.audioPlayer = new TapeRecorder();
         try {
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
@@ -64,8 +67,19 @@ class ClientHandler implements Runnable {
                         sendMessageGroup(groupName, content);
                     } else if(target.startsWith("@")){
                         clients.sendPrivateMessage(clientName, target.substring(1), content);
+                    }    
+                }else if (message.startsWith("/Audio")) {
+                    String[] parts = message.split(" ", 2);
+                    String target = parts[1];
+                    if (target.startsWith("#")) {
+                        String groupName = target.substring(1);
+                        clients.sendVoiceMessageToGroup(groupName, clientName);
+                    } else if (target.startsWith("@")) {
+                        String receiverUser = target.substring(1);
+                        clients.sendPrivateVoiceMessage(clientName, receiverUser);
                     }
                 }
+
             }
         } catch (IOException e) {
             e.printStackTrace();

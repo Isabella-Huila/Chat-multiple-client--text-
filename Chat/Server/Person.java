@@ -6,6 +6,7 @@ import java.net.Socket;
 public class Person {
     private String name;
     PrintWriter out;
+    private TapeRecorder audioRecorder = new TapeRecorder();
 
     public Person(String name, PrintWriter out){
         this.name = name;
@@ -19,6 +20,8 @@ public class Person {
     public PrintWriter getOut() {
         return out;
     }
+
+    public TapeRecorder  getAudioRecorder(){ return audioRecorder; }
 
     
 }
