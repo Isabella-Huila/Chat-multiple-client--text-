@@ -28,7 +28,7 @@ class ClientHandler implements Runnable {
                     return;
                 }
                 synchronized (clientName) {
-                    if (!clientName.isBlank() && !clients.existeUsr(clientName)) {
+                    if (!clientName.trim().isEmpty() && !clients.existeUsr(clientName)) {
                         clients.broadcastMessage(clientName + " se ha unido al chat.");
                         out.println("NAMEACCEPTED " + clientName);
                         clients.addUsr(clientName, out);

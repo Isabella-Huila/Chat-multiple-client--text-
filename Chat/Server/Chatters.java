@@ -20,7 +20,7 @@ public class Chatters {
     }
 
     public void addUsr(String name, PrintWriter out) {
-        if (!name.isBlank() && !existeUsr(name)) {
+        if (!name.trim().isEmpty() && !existeUsr(name)) {
             Person p = new Person(name, out);
             clients.add(p);
         }
