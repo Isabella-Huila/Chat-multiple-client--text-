@@ -1,3 +1,4 @@
+import java.io.ByteArrayOutputStream;
 import java.util.Set;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -6,7 +7,8 @@ import java.net.Socket;
 public class Person {
     private String name;
     PrintWriter out;
-    private TapeRecorder audioRecorder = new TapeRecorder();
+
+    private TapeRecorder audioRecorder;
 
     public Person(String name, PrintWriter out){
         this.name = name;
@@ -21,7 +23,11 @@ public class Person {
         return out;
     }
 
-    public TapeRecorder  getAudioRecorder(){ return audioRecorder; }
+    public TapeRecorder  getAudioRecorder(){
+        audioRecorder =new TapeRecorder();
+        return audioRecorder;
+    }
+
 
     
 }

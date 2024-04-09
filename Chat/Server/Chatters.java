@@ -110,31 +110,31 @@ public class Chatters {
                 p.getOut().println("Grabación terminada");
             }
         }
-    
+
         if (existsGroup(groupName)) {
             Group group = groups.get(groupName);
-            for (PrintWriter escritor : group.getMembers()) {
+            for (PrintWriter writer : group.getMembers()) {
                 for (Person p : clients) {
-                    if (escritor.equals(p.getOut()) && !p.getName().equals(senderName)) {
+                    if (writer.equals(p.getOut()) && !p.getName().equals(senderName)) {
                         p.getOut().println("[Group: " + groupName + ", Sender: " + senderName + "] Audio:");
                         p.getOut().println("Reproduciendo");
                         p.getAudioRecorder().reproduceAudio(byteArrayOutputStream);
                     }
                 }
             }
-            
         }
     }
 
-    public void sendPrivateVoiceMessage(String senderName, String recipientName){
+    public void sendPrivateVoiceMessage(String senderName, String recipientName) {
         ByteArrayOutputStream byteArrayOutputStream = null;
-        for (Person p: clients) {
-            if (senderName == p.getName()){
+        for (Person p : clients) {
+            if (senderName.equals(p.getName())) {
                 p.getOut().println("Grabando...");
                 byteArrayOutputStream = p.getAudioRecorder().recordAudio();
-                p.getOut().println("Grabacion terminada");
+                p.getOut().println("Grabación terminada");
             }
         }
+
         for (Person p : clients) {
             if (recipientName.equals(p.getName())) {
                 p.getOut().println("[Private audio from " + senderName + "] ");
@@ -142,7 +142,6 @@ public class Chatters {
                 p.getAudioRecorder().reproduceAudio(byteArrayOutputStream);
             }
         }
-
     }
 
 
