@@ -1,12 +1,15 @@
-import java.util.*;
+    import java.util.*;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 
 public class Chatters {
     private Set<Person> clients = new HashSet<>();
     private Map<String, Group> groups = new HashMap<>();
-    private StringBuilder allHistory = new StringBuilder();
+    private StringBuilder history = new StringBuilder();
 
     public Chatters() {}
 
@@ -44,6 +47,7 @@ public class Chatters {
         for (Person p : clients) {
             p.getOut().println(message);
         }
+        history.append(message).append("\n");
     }
 
     public void sendPrivateMessage(String nameSrc, String nameDest, String message) {
@@ -55,7 +59,14 @@ public class Chatters {
                 break;
             }
         }
-        if (!encontrado) {
+        if (encontrado) {
+            history.append("[Chat privado de " + nameSrc + " para " + nameDest + "]: " + message).append("\n");
+            try {
+                saveHistory(history);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
             System.out.println("No se encontró al usuario " + nameDest);
         }
     }
@@ -95,12 +106,20 @@ public class Chatters {
         Group group = groups.get(groupName);
         if (group != null) {
             group.enviarMensaje(mensaje);
+            history.append("[Grupo " + groupName + "] " + mensaje).append("\n");
+            try {
+                saveHistory(history);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        
     }
 
     public Map<String, Group> getGroups() {
         return groups;
     }
+    
     public void sendVoiceMessageToGroup(String groupName, String senderName) {
         ByteArrayOutputStream byteArrayOutputStream = null;
         for (Person p : clients) {
@@ -110,31 +129,36 @@ public class Chatters {
                 p.getOut().println("Grabación terminada");
             }
         }
-
+    
         if (existsGroup(groupName)) {
             Group group = groups.get(groupName);
-            for (PrintWriter writer : group.getMembers()) {
+            for (PrintWriter escritor : group.getMembers()) {
                 for (Person p : clients) {
-                    if (writer.equals(p.getOut()) && !p.getName().equals(senderName)) {
+                    if (escritor.equals(p.getOut()) && !p.getName().equals(senderName)) {
                         p.getOut().println("[Group: " + groupName + ", Sender: " + senderName + "] Audio:");
                         p.getOut().println("Reproduciendo");
                         p.getAudioRecorder().reproduceAudio(byteArrayOutputStream);
                     }
                 }
             }
+            history.append("[Grupo " + groupName + "] " + senderName + " envió un audio").append("\n");
+            try {
+                saveHistory(history);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void sendPrivateVoiceMessage(String senderName, String recipientName) {
+    public void sendPrivateVoiceMessage(String senderName, String recipientName){
         ByteArrayOutputStream byteArrayOutputStream = null;
-        for (Person p : clients) {
-            if (senderName.equals(p.getName())) {
+        for (Person p: clients) {
+            if (senderName == p.getName()){
                 p.getOut().println("Grabando...");
                 byteArrayOutputStream = p.getAudioRecorder().recordAudio();
-                p.getOut().println("Grabación terminada");
+                p.getOut().println("Grabacion terminada");
             }
         }
-
         for (Person p : clients) {
             if (recipientName.equals(p.getName())) {
                 p.getOut().println("[Private audio from " + senderName + "] ");
@@ -142,7 +166,37 @@ public class Chatters {
                 p.getAudioRecorder().reproduceAudio(byteArrayOutputStream);
             }
         }
+        history.append("[Chat privado] " + senderName + " envió un audio a " + recipientName).append("\n");
+        try {
+            saveHistory(history);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
+    static String folder = "Chat/Historial";
+    static String path = "Chat/Historial/history.txt";
+    
 
+    public static void saveHistory(StringBuilder history) throws IOException {
+        File file = new File(path);
+            if (!file.exists()) {
+                File f = new File(folder);
+                if (!f.exists()) {
+                    f.mkdirs();
+                }
+                file.createNewFile();
+            }
+
+            FileWriter writer = new FileWriter(file, true); 
+            writer.write(history.toString());
+            writer.flush();
+            writer.close();
+        }
+
+    public StringBuilder gethistory() {
+        return history;
+    }
 }
+
+

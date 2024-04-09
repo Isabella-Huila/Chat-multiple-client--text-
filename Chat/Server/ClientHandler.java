@@ -89,6 +89,8 @@ class ClientHandler implements Runnable {
                         clients.sendPrivateVoiceMessage(clientName, receiverUser);
                     }
                     menu();
+                }else if (message.equals("/verhistorial")) {
+                    showHistory(clientSocket, clients);
                 }
 
             }
@@ -121,5 +123,12 @@ class ClientHandler implements Runnable {
 
     private void sendMessageGroup(String groupName, String mensaje) {
         clients.sendMessageGroup(groupName, clientName + ": " + mensaje);
+    }
+
+    private void showHistory(Socket socket, Chatters clients) throws IOException {
+        out= new PrintWriter(socket.getOutputStream(), true);
+        StringBuilder history = clients.gethistory();
+        out.println("Historial completo:");
+        out.println(history.toString());
     }
 }
