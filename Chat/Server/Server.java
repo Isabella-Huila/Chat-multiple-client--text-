@@ -16,7 +16,7 @@ public class Server {
         int PORT = 6789;
         Chatters clientes = new Chatters();
 
-        ExecutorService executor = Executors.newFixedThreadPool(200);
+        ExecutorService executor = Executors.newFixedThreadPool(8);
 
         try {
             ServerSocket serverSocket = new ServerSocket(PORT);

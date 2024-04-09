@@ -41,7 +41,7 @@ public class TapeRecorder {
     }
 
     public ByteArrayOutputStream recordAudio() {
-        int duration = 5; // Duración de la grabación en segundos
+        int duration = 15; // Duración de la grabación en segundos
 
         // Iniciar objeto de grabación de audio
         RecordAudio recorder = new RecordAudio(format, duration, byteArrayOutputStream);

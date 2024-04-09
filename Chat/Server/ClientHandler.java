@@ -21,6 +21,16 @@ class ClientHandler implements Runnable {
         }
     }
 
+    public void menu(){
+        out.println("\n/creategroup <nombre_grupo>: Crea un nuevo grupo (el usuario que crea el grupo no se agrega automáticamente al mismo).\n" +
+                "/join <nombre_grupo>: Une al usuario al grupo especificado.\n" +
+                "/leave <nombre_grupo>: Elimina al usuario del grupo especificado.\n" +
+                "/send #<nombre_grupo>|<mensaje>: Envía un mensaje al grupo especificado.\n" +
+                "/send @<usuario>|<mensaje>: Envía un mensaje a un usuario específico.\n" +
+                "/audio #<nombre_grupo>: Envía un mensaje de voz de 15 segundos al grupo especificado.\n" +
+                "/audio @<usuario>: Envía un mensaje de voz de 15 segundos al usuario especificado.\n");
+    }
+
     @Override
     public void run() {
         try {
@@ -35,29 +45,28 @@ class ClientHandler implements Runnable {
                         clients.broadcastMessage(clientName + " se ha unido al chat.");
                         out.println("NAMEACCEPTED " + clientName);
                         clients.addUsr(clientName, out);
+                        menu();
                         break;
                     }
                 }
             }
-            /**
-             * /creategroup <nombre_grupo>: Crea un nuevo grupo.
-             * /join <nombre_grupo>: Une al usuario al grupo especificado.
-             * /leave <nombre_grupo>: Elimina al usuario del grupo especificado.
-             * /send #<nombre_grupo>|<mensaje>: Envía un mensaje al grupo especificado.
-             * /send @<usuario>|<mensaje>: Envía un mensaje a un usuario específico.
-             */
+
 
             String message;
             while ((message = in.readLine()) != null) {
+
                 if (message.startsWith("/creategroup")) {
                     String groupName = message.substring(13);
                     createGroup(groupName);
+                    menu();
                 } else if (message.startsWith("/join")) {
                     String groupName = message.substring(6);
                     joinGroup(groupName);
+                    menu();
                 } else if (message.startsWith("/leave")) {
                     String groupName = message.substring(7);
                     leaveGroup(groupName);
+                    menu();
                 } else if (message.startsWith("/send")) {
                     String[] parts = message.substring(6).split("\\|", 2);
                     String target = parts[0].trim();
@@ -67,8 +76,9 @@ class ClientHandler implements Runnable {
                         sendMessageGroup(groupName, content);
                     } else if(target.startsWith("@")){
                         clients.sendPrivateMessage(clientName, target.substring(1), content);
-                    }    
-                }else if (message.startsWith("/Audio")) {
+                    }
+                    menu();
+                }else if (message.startsWith("/audio")) {
                     String[] parts = message.split(" ", 2);
                     String target = parts[1];
                     if (target.startsWith("#")) {
@@ -78,6 +88,7 @@ class ClientHandler implements Runnable {
                         String receiverUser = target.substring(1);
                         clients.sendPrivateVoiceMessage(clientName, receiverUser);
                     }
+                    menu();
                 }
 
             }
@@ -85,6 +96,7 @@ class ClientHandler implements Runnable {
             e.printStackTrace();
         } finally {
             try {
+                out.println(" haz abandonado el chat, debes volver a ejecutar un Client.java si quieres volver a unirte");
                 clientSocket.close();
                 System.out.println(clientName + " ha abandonado el chat.");
                 clients.broadcastMessage(clientName + " ha abandonado el chat.");
