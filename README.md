@@ -21,6 +21,7 @@ Los usuarios pueden interactuar con el sistema utilizando los siguientes comando
 - `/send @<usuario>|<mensaje>`: Envía un mensaje a un usuario específico.
 - `/audio #<nombre_grupo>`: Envía un mensaje de voz de 15 segundos al grupo especificado.
 - `/audio @<usuario>`: Envía un mensaje de voz de 15 segundos al usuario especificado.
+- `/verhistorial`: Muestra el historial de los mensajes que se han enviado tanto en grupo como individual.
 
 
 ## Autores:
