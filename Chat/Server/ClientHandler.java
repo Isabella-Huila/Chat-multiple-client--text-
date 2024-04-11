@@ -28,7 +28,8 @@ class ClientHandler implements Runnable {
                 "/send #<nombre_grupo>|<mensaje>: Envía un mensaje al grupo especificado.\n" +
                 "/send @<usuario>|<mensaje>: Envía un mensaje a un usuario específico.\n" +
                 "/audio #<nombre_grupo>: Envía un mensaje de voz de 15 segundos al grupo especificado.\n" +
-                "/audio @<usuario>: Envía un mensaje de voz de 15 segundos al usuario especificado.\n");
+                "/audio @<usuario>: Envía un mensaje de voz de 15 segundos al usuario especificado.\n" +
+                "/verhistorial : Se muestra el Historial de los mensajes que se han mandado por grupo o individual.\n");
     }
 
     @Override
